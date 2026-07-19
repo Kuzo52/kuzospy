@@ -396,23 +396,15 @@ a {
   box-shadow: 0 12px 30px rgba(61, 214, 198, 0.25);
 }
 
-.btn--hold {
-  margin-top: auto;
-  background: #1a2330;
-  color: var(--text);
-  border: 1px solid var(--line);
-}
-
-.btn--hold.is-pressed {
-  background: linear-gradient(135deg, rgba(61, 214, 198, 0.2), rgba(91, 140, 255, 0.2));
-  border-color: rgba(61, 214, 198, 0.5);
-}
-
 .btn--ghost {
   margin-top: auto;
   background: transparent;
   color: var(--accent);
   border: 1px solid rgba(61, 214, 198, 0.35);
+}
+
+#btn-reveal {
+  margin-top: auto;
 }
 
 .btn--danger {
@@ -429,9 +421,9 @@ a {
 }
 
 .deal__title {
-  margin: 4px 0 0;
+  margin: 0;
   text-align: center;
-  font-size: clamp(1.35rem, 5vw, 1.6rem);
+  font-size: clamp(1.35rem, 5vw, 1.55rem);
   font-weight: 800;
   letter-spacing: -0.03em;
   flex-shrink: 0;
@@ -439,24 +431,26 @@ a {
 
 .deal__sub {
   text-align: center;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   flex-shrink: 0;
+  margin-bottom: 0;
 }
 
 .card-stage {
   flex: 1;
   display: grid;
   place-items: center;
+  align-content: start;
+  padding-top: 0.35rem;
   perspective: 1400px;
   min-height: 0;
   width: 100%;
 }
 
 .card {
-  width: min(100%, 360px);
-  height: min(56dvh, 440px);
+  width: min(100%, 380px);
+  height: min(64dvh, 520px);
   cursor: pointer;
-  touch-action: none;
   user-select: none;
 }
 
@@ -611,20 +605,22 @@ a {
 /* Как в KuzoCards */
 .footer {
   flex-shrink: 0;
-  padding-top: 10px;
+  padding-top: 12px;
   text-align: center;
 }
 
 .footer p {
   margin: 0;
-  font-size: 0.8rem;
-  color: rgba(242, 245, 248, 0.45);
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(242, 245, 248, 0.55);
 }
 
 .footer a {
   color: var(--accent);
+  font-weight: 700;
   text-decoration: none;
-  border-bottom: 1px solid rgba(61, 214, 198, 0.35);
+  border-bottom: 1px solid rgba(61, 214, 198, 0.4);
 }
 
 .footer a:active {
@@ -633,7 +629,7 @@ a {
 
 @media (max-height: 700px) {
   .card {
-    height: min(50dvh, 360px);
+    height: min(58dvh, 420px);
   }
 
   .stepper__btn,

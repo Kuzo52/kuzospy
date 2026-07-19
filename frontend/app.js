@@ -293,9 +293,11 @@
 
   function resetCardView() {
     els.roleCard.classList.remove("is-flipped", "is-spy", "is-location");
-    els.btnReveal.classList.remove("is-pressed");
     els.cardRole.textContent = "—";
     els.cardRoleLabel.textContent = "Твоя роль";
+    els.btnReveal.textContent = "Открыть карту";
+    els.btnReveal.classList.remove("btn--ghost");
+    els.btnReveal.classList.add("btn--primary");
   }
 
   function prepareDealScreen() {
@@ -315,15 +317,14 @@
 
     if (mode === "take") {
       els.dealTitle.textContent = `Игрок ${player}, возьми телефон`;
-      els.dealSub.textContent =
-        "Зажми кнопку «Посмотреть карту». Отпусти — карта снова спрячется.";
+      els.dealSub.textContent = "Открой карту, запомни роль и закрой.";
       return;
     }
 
     if (mode === "pass") {
       if (player < total) {
         els.dealTitle.textContent = `Передай телефон Игроку ${player + 1}`;
-        els.dealSub.textContent = "Убедись, что карту никто больше не видит.";
+        els.dealSub.textContent = "Карта закрыта — можно передавать.";
       } else {
         els.dealTitle.textContent = "Все посмотрели карты";
         els.dealSub.textContent = "Можно начинать игру.";
@@ -331,7 +332,7 @@
     }
   }
 
-  function showCard() {
+  function openCard() {
     const role = state.cards[state.currentIndex];
     const isSpy = role === "Шпион";
 
@@ -340,16 +341,17 @@
     els.roleCard.classList.toggle("is-spy", isSpy);
     els.roleCard.classList.toggle("is-location", !isSpy);
     els.roleCard.classList.add("is-flipped");
-    els.btnReveal.classList.add("is-pressed");
+    els.btnReveal.textContent = "Закрыть карту";
+    els.btnReveal.classList.remove("btn--primary");
+    els.btnReveal.classList.add("btn--ghost");
     state.hasSeenCard = true;
+    haptic("light");
   }
 
-  function hideCard() {
-    els.roleCard.classList.remove("is-flipped");
-    els.btnReveal.classList.remove("is-pressed");
-
+  function closeCard() {
     if (!state.hasSeenCard) return;
 
+    els.roleCard.classList.remove("is-flipped");
     els.btnReveal.hidden = true;
     els.btnReveal.disabled = true;
     els.btnNextPlayer.hidden = false;
@@ -359,6 +361,16 @@
     els.btnNextPlayer.textContent = isLast
       ? "Начать игру"
       : `Передай телефон Игроку ${state.currentIndex + 2}`;
+    haptic("light");
+  }
+
+  function onRevealClick() {
+    if (els.btnReveal.disabled || els.btnReveal.hidden) return;
+    if (els.roleCard.classList.contains("is-flipped")) {
+      closeCard();
+      return;
+    }
+    openCard();
   }
 
   function goNextPlayer() {
@@ -490,31 +502,10 @@
     void startGame();
   });
 
-  const revealTargets = [els.btnReveal, els.roleCard];
-
-  function onRevealStart(event) {
-    if (els.btnReveal.disabled || els.btnReveal.hidden) return;
-    event.preventDefault();
-    showCard();
-  }
-
-  function onRevealEnd(event) {
-    if (!state.hasSeenCard) return;
-    event.preventDefault();
-    hideCard();
-  }
-
-  revealTargets.forEach((target) => {
-    target.addEventListener("pointerdown", onRevealStart);
-    target.addEventListener("pointerup", onRevealEnd);
-    target.addEventListener("pointerleave", onRevealEnd);
-    target.addEventListener("pointercancel", onRevealEnd);
-  });
-
-  window.addEventListener("pointerup", () => {
-    if (els.roleCard.classList.contains("is-flipped")) {
-      hideCard();
-    }
+  els.btnReveal.addEventListener("click", onRevealClick);
+  els.roleCard.addEventListener("click", () => {
+    if (els.btnReveal.hidden || els.btnReveal.disabled) return;
+    onRevealClick();
   });
 
   els.btnNextPlayer.addEventListener("click", goNextPlayer);
