@@ -1,5 +1,6 @@
-KuzoSpy → Bothost (bothost.ru) — пошаговый план
-================================================
+KuzoSpy → Bothost (bothost.ru) — ТВОЙ ЕДИНСТВЕННЫЙ ШАГ
+======================================================
+Всё на GitHub уже сделано. Дальше работаешь только здесь.
 Тариф: Pro (250 ₽/мес) — хватает с запасом.
 
 Уже готово без тебя:
@@ -7,6 +8,7 @@ KuzoSpy → Bothost (bothost.ru) — пошаговый план
 - Репозиторий:      https://github.com/Kuzo52/kuzospy
 - Бот в Telegram:   @kuzospygamebot
 - Кнопка меню бота уже ведёт на GitHub Pages
+- Код бэкенда в репо готов к Git-деплою на Bothost
 
 
 ════════════════════════════════════════
@@ -91,7 +93,7 @@ KuzoSpy → Bothost (bothost.ru) — пошаговый план
    frontend/config.js
 
 2. Замени строку:
-   API_URL: "https://YOUR_SERVER.bot-hosting.net",
+   API_URL: "https://YOUR_SERVER.bothost.ru",
 
    на свой домен БЕЗ слэша в конце, например:
    API_URL: "https://kuzospy-xxxx.bothost.ru",

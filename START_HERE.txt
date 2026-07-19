@@ -1,0 +1,28 @@
+KuzoSpy — что уже сделано и что осталось тебе
+==============================================
+
+ГОТОВО НА GITHUB (я сделал сам):
+--------------------------------
+✓ Репозиторий:   https://github.com/Kuzo52/kuzospy
+✓ Mini App:      https://kuzo52.github.io/kuzospy/
+✓ Бот:           @kuzospygamebot
+✓ Кнопка меню бота → GitHub Pages
+✓ Код бэкенда готов к деплою на Bothost
+  (main.py + requirements.txt + Dockerfile в корне репо)
+✓ Инструкция по полям Bothost: файл BOTHOSTING.txt
+
+
+ТВОЙ ЕДИНСТВЕННЫЙ ОСТАВШИЙСЯ ШАГ:
+---------------------------------
+Задеплоить бэкенд на https://bothost.ru/ (тариф Pro).
+
+Открой файл BOTHOSTING.txt и иди по шагам 1→6.
+Там расписано, что вписать в каждое поле формы.
+
+
+ПОСЛЕ ТОГО КАК BOTHOST ВЫДАСТ ДОМЕН:
+------------------------------------
+Пришли мне ссылку вида https://….bothost.ru
+Я сам пропишу её в frontend/config.js и запушу на GitHub Pages.
+
+Либо сделай сам (1 строка в frontend/config.js) — тоже описано в BOTHOSTING.txt.

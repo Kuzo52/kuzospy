@@ -1,5 +1,7 @@
-// После деплоя бэкенда на bot-hosting.ru вставь сюда свой HTTPS-адрес
-// (без слэша в конце), сохрани и запушь — GitHub Pages обновится сам.
+// GitHub Pages готов.
+// Сюда вставь HTTPS-адрес бэкенда с bothost.ru (без слэша в конце),
+// когда Bothost выдаст домен. Пример:
+// API_URL: "https://kuzospy-xxxx.bothost.ru",
 window.KUZOSPY_CONFIG = {
-  API_URL: "https://YOUR_SERVER.bot-hosting.net",
+  API_URL: "https://YOUR_SERVER.bothost.ru",
 };
