@@ -87,6 +87,9 @@
   }
 
   const els = {
+    welcome: document.getElementById("welcome"),
+    welcomeBtn: document.getElementById("welcome-btn"),
+    app: document.getElementById("app"),
     setup: document.getElementById("screen-setup"),
     deal: document.getElementById("screen-deal"),
     play: document.getElementById("screen-play"),
@@ -108,6 +111,26 @@
     btnEnd: document.getElementById("btn-end"),
     btnRestart: document.getElementById("btn-restart"),
   };
+
+  function haptic(type) {
+    try {
+      tg?.HapticFeedback?.impactOccurred?.(type || "light");
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function dismissWelcome() {
+    haptic("light");
+    els.welcome.classList.add("welcome--out");
+    window.setTimeout(() => {
+      els.app.hidden = false;
+      showScreen("setup");
+    }, 180);
+    window.setTimeout(() => {
+      els.welcome.hidden = true;
+    }, 680);
+  }
 
   function showScreen(name) {
     const map = {
@@ -344,6 +367,7 @@
     state.currentIndex = 0;
     state.hasSeenCard = false;
     setSetupError("");
+    els.app.hidden = false;
     showScreen("setup");
   }
 
@@ -435,6 +459,8 @@
     updateSpiesUI();
   });
 
+  els.welcomeBtn.addEventListener("click", dismissWelcome);
+
   els.btnStart.addEventListener("click", () => {
     void startGame();
   });
@@ -473,5 +499,7 @@
 
   updatePlayersUI();
   updateSpiesUI();
-  showScreen("setup");
+  els.app.hidden = true;
+  els.welcome.hidden = false;
+  els.welcome.classList.remove("welcome--out");
 })();

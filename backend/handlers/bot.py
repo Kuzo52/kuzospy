@@ -6,6 +6,7 @@ import os
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart
+from aiogram.enums import ParseMode
 from aiogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
@@ -13,6 +14,16 @@ from aiogram.types import (
     Message,
     WebAppInfo,
 )
+
+WELCOME_HTML = (
+    "🕵️ <b>Добро пожаловать в KuzoSpy!</b>\n\n"
+    "Локальная игра «Шпион» для компании прямо в Telegram. "
+    "Один телефон по кругу — смотрите карты по очереди "
+    "и найдите шпиона среди своих.\n\n"
+    "Жми кнопку ниже и погнали! 👇\n\n"
+    'Made by <a href="https://t.me/kuzoceo">@kuzoceo</a>'
+)
+
 
 def get_webapp_url() -> str:
     return os.getenv(
@@ -26,7 +37,7 @@ def build_webapp_keyboard() -> InlineKeyboardMarkup:
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="Открыть KuzoSpy",
+                    text="Играть",
                     web_app=WebAppInfo(url=get_webapp_url()),
                 )
             ]
@@ -40,11 +51,10 @@ def setup_bot(bot: Bot, dp: Dispatcher) -> None:
     @dp.message(CommandStart())
     async def cmd_start(message: Message) -> None:
         await message.answer(
-            "Привет! Это KuzoSpy — локальная игра «Шпион».\n\n"
-            "Сядьте за стол, передавайте один телефон по кругу "
-            "и найдите шпиона среди своих.\n\n"
-            "Нажми кнопку ниже, чтобы начать.",
+            WELCOME_HTML,
             reply_markup=build_webapp_keyboard(),
+            parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True,
         )
 
         try:
