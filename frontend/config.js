@@ -1,7 +1,5 @@
-// GitHub Pages готов.
-// Сюда вставь HTTPS-адрес бэкенда с bothost.ru (без слэша в конце),
-// когда Bothost выдаст домен. Пример:
-// API_URL: "https://kuzospy-xxxx.bothost.ru",
+// Если Bothost выдаст публичный HTTPS-домен — вставь его сюда.
+// Пока домена нет, игра работает локально на телефоне (без сервера).
 window.KUZOSPY_CONFIG = {
-  API_URL: "https://YOUR_SERVER.bothost.ru",
+  API_URL: "",
 };

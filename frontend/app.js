@@ -188,7 +188,46 @@
     els.locationsList.replaceChildren(fragment);
   }
 
+  function isApiConfigured() {
+    return Boolean(
+      API_URL &&
+        !API_URL.includes("YOUR_SERVER") &&
+        /^https?:\/\//i.test(API_URL)
+    );
+  }
+
+  function shuffle(array) {
+    const copy = array.slice();
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = copy[i];
+      copy[i] = copy[j];
+      copy[j] = tmp;
+    }
+    return copy;
+  }
+
+  function createLocalDeck(players, spies) {
+    if (spies >= players) {
+      throw new Error("Шпионов должно быть меньше, чем игроков");
+    }
+    const location =
+      FALLBACK_LOCATIONS[Math.floor(Math.random() * FALLBACK_LOCATIONS.length)];
+    const deck = Array(spies)
+      .fill("Шпион")
+      .concat(Array(players - spies).fill(location));
+    return shuffle(deck);
+  }
+
   async function loadLocations() {
+    if (!isApiConfigured()) {
+      state.locations = FALLBACK_LOCATIONS.slice().sort((a, b) =>
+        a.localeCompare(b, "ru")
+      );
+      renderLocations();
+      return;
+    }
+
     try {
       const response = await fetch(`${API_URL}/api/locations`);
       if (!response.ok) throw new Error("locations failed");
@@ -197,7 +236,9 @@
         state.locations = data.locations;
       }
     } catch (_) {
-      state.locations = FALLBACK_LOCATIONS.slice();
+      state.locations = FALLBACK_LOCATIONS.slice().sort((a, b) =>
+        a.localeCompare(b, "ru")
+      );
     }
     renderLocations();
   }
@@ -312,35 +353,49 @@
     els.btnStart.textContent = "Готовим карты…";
 
     try {
-      const url = new URL(`${API_URL}/api/game`);
-      url.searchParams.set("players", String(state.players));
-      url.searchParams.set("spies", String(state.spies));
+      let cards = null;
 
-      const response = await fetch(url.toString());
-      if (!response.ok) {
-        let detail = "Не удалось создать игру";
+      if (isApiConfigured()) {
         try {
-          const errorData = await response.json();
-          if (errorData.detail) detail = String(errorData.detail);
+          const url = new URL(`${API_URL}/api/game`);
+          url.searchParams.set("players", String(state.players));
+          url.searchParams.set("spies", String(state.spies));
+
+          const response = await fetch(url.toString());
+          if (!response.ok) {
+            let detail = "Не удалось создать игру";
+            try {
+              const errorData = await response.json();
+              if (errorData.detail) detail = String(errorData.detail);
+            } catch (_) {
+              /* ignore parse errors */
+            }
+            throw new Error(detail);
+          }
+
+          const data = await response.json();
+          if (!Array.isArray(data.cards) || data.cards.length !== state.players) {
+            throw new Error("Сервер вернул странный ответ");
+          }
+          cards = data.cards;
         } catch (_) {
-          /* ignore parse errors */
+          /* Bothost без домена — играем локально */
+          cards = null;
         }
-        throw new Error(detail);
       }
 
-      const data = await response.json();
-      if (!Array.isArray(data.cards) || data.cards.length !== state.players) {
-        throw new Error("Сервер вернул странный ответ");
+      if (!cards) {
+        cards = createLocalDeck(state.players, state.spies);
       }
 
-      state.cards = data.cards;
+      state.cards = cards;
       await loadLocations();
       prepareDealScreen();
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
-          : "Ошибка сети. Проверь адрес API.";
+          : "Не удалось начать игру.";
       setSetupError(message);
     } finally {
       els.btnStart.disabled = false;
