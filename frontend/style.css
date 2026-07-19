@@ -11,7 +11,6 @@
   --spy: #ff7a59;
   --safe: #3dd6c6;
   --radius: 20px;
-  --radius-sm: 14px;
   --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
   --ease-snappy: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-fluid: cubic-bezier(0.4, 0, 0.2, 1);
@@ -31,18 +30,15 @@ html,
 body {
   margin: 0;
   min-height: 100%;
+  min-height: 100dvh;
   background:
-    radial-gradient(120% 80% at 10% -10%, rgba(91, 140, 255, 0.18), transparent 45%),
-    radial-gradient(100% 70% at 100% 0%, rgba(61, 214, 198, 0.12), transparent 40%),
+    radial-gradient(120% 80% at 10% -10%, rgba(91, 140, 255, 0.16), transparent 45%),
+    radial-gradient(100% 70% at 100% 0%, rgba(61, 214, 198, 0.1), transparent 40%),
     var(--bg);
   color: var(--text);
   font-family: ui-rounded, "SF Pro Display", "Segoe UI", system-ui, -apple-system, sans-serif;
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
-}
-
-body {
-  min-height: 100dvh;
 }
 
 button,
@@ -51,8 +47,8 @@ a {
   font: inherit;
 }
 
-/* ——— Welcome (логика как в KuzoCards) ——— */
-.welcome {
+/* ——— Полноэкранные окна (как welcome/modes в KuzoCards) ——— */
+.overlay {
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -65,7 +61,7 @@ a {
   isolation: isolate;
   padding:
     calc(2rem + var(--safe-top))
-    1.75rem
+    1.5rem
     calc(2rem + var(--safe-bottom));
   background:
     radial-gradient(ellipse 70% 45% at 50% 30%, rgba(61, 214, 198, 0.12), transparent 62%),
@@ -79,11 +75,33 @@ a {
     visibility 0.65s;
 }
 
-.welcome[hidden] {
+.overlay[hidden] {
   display: none !important;
 }
 
-.welcome__glow {
+.overlay--setup {
+  z-index: 90;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(0.65rem);
+  pointer-events: none;
+}
+
+.overlay--setup.is-in {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.overlay.is-out {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-0.5rem) scale(0.99);
+  pointer-events: none;
+}
+
+.overlay__glow {
   position: absolute;
   width: 12rem;
   height: 12rem;
@@ -92,10 +110,15 @@ a {
   filter: blur(18px);
   pointer-events: none;
   opacity: 0.55;
-  animation: welcomePulse 4.5s var(--ease-fluid) infinite;
+  animation: overlayPulse 4.5s var(--ease-fluid) infinite;
 }
 
-.welcome__brand {
+.overlay.is-out .overlay__glow {
+  animation: none;
+  opacity: 0;
+}
+
+.overlay__brand {
   position: relative;
   margin: 0;
   font-size: 0.8rem;
@@ -103,10 +126,10 @@ a {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--accent);
-  animation: welcomeIn 0.9s var(--ease-out) both;
+  animation: overlayIn 0.9s var(--ease-out) both;
 }
 
-.welcome__title {
+.overlay__title {
   position: relative;
   margin: 0;
   max-width: 14ch;
@@ -115,10 +138,15 @@ a {
   letter-spacing: -0.045em;
   line-height: 1.08;
   text-align: center;
-  animation: welcomeIn 0.9s 0.1s var(--ease-out) both;
+  animation: overlayIn 0.9s 0.1s var(--ease-out) both;
 }
 
-.welcome__text {
+.overlay__title--sm {
+  font-size: clamp(1.7rem, 6.5vw, 2.2rem);
+  max-width: 16ch;
+}
+
+.overlay__text {
   position: relative;
   margin: 0;
   max-width: 26ch;
@@ -126,166 +154,58 @@ a {
   line-height: 1.45;
   text-align: center;
   color: var(--muted);
-  animation: welcomeIn 0.9s 0.18s var(--ease-out) both;
+  animation: overlayIn 0.9s 0.18s var(--ease-out) both;
 }
 
-.welcome__btn {
+.overlay__btn {
   position: relative;
   margin-top: 0.85rem;
-  min-width: 11.5rem;
-  height: 3.25rem;
+  min-width: 12rem;
+  height: 3.35rem;
   padding: 0 1.85rem;
   border: 0;
   border-radius: 16px;
   cursor: pointer;
+  font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: #061018;
   background: linear-gradient(135deg, #3dd6c6, #5b8cff);
   box-shadow: 0 14px 34px rgba(61, 214, 198, 0.28);
-  transition:
-    transform 0.25s var(--ease-snappy),
-    box-shadow 0.3s var(--ease-fluid),
-    filter 0.3s var(--ease-fluid);
-  animation: welcomeIn 0.9s 0.26s var(--ease-out) both;
+  transition: transform 0.25s var(--ease-snappy);
+  animation: overlayIn 0.9s 0.26s var(--ease-out) both;
 }
 
-.welcome__btn:active {
+.overlay__btn:active {
   transform: scale(0.97);
 }
 
-.welcome__chat {
+.overlay__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.setup-box {
   position: relative;
-  margin-top: 0.35rem;
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 0.9rem;
-  border-bottom: 1px solid rgba(139, 151, 168, 0.35);
-  animation: welcomeIn 0.9s 0.34s var(--ease-out) both;
-}
-
-.welcome__chat:active {
-  color: var(--accent);
-  border-color: rgba(61, 214, 198, 0.45);
-}
-
-.welcome--out {
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-0.5rem) scale(0.99);
-  pointer-events: none;
-}
-
-.welcome--out .welcome__glow {
-  animation: none;
-  opacity: 0;
-}
-
-@keyframes welcomeIn {
-  from {
-    opacity: 0;
-    transform: translateY(1rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes welcomePulse {
-  0%,
-  100% {
-    opacity: 0.4;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(1.05);
-  }
-}
-
-/* ——— App ——— */
-.app {
-  width: min(100%, 430px);
-  min-height: 100dvh;
-  margin: 0 auto;
-  padding:
-    calc(16px + var(--safe-top))
-    16px
-    calc(20px + var(--safe-bottom));
-  display: flex;
-  flex-direction: column;
-  animation: fade-in 0.45s var(--ease-out);
-}
-
-.app[hidden] {
-  display: none !important;
-}
-
-.screen {
-  display: none;
-  flex: 1;
-  flex-direction: column;
-  gap: 16px;
-  min-height: 0;
-}
-
-.screen--active,
-.screen:not([hidden]) {
-  display: flex;
-}
-
-.brand {
+  width: min(100%, 22rem);
+  margin-top: 0.5rem;
   display: grid;
-  gap: 8px;
-  padding-top: 4px;
-}
-
-.brand__mark {
-  margin: 0;
-  font-size: 0.85rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--accent);
-  font-weight: 700;
-}
-
-.brand__title,
-.play__title {
-  margin: 0;
-  font-size: clamp(1.85rem, 6.5vw, 2.3rem);
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-}
-
-.brand__text,
-.play__text,
-.deal__sub,
-.hint,
-.timer__label {
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.45;
-}
-
-.panel {
-  display: grid;
-  gap: 22px;
-  padding: 22px 18px;
-  background: var(--bg-panel);
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
-  backdrop-filter: blur(16px);
-  box-shadow: var(--shadow);
+  animation: overlayIn 0.9s 0.22s var(--ease-out) both;
 }
 
 .field {
   display: grid;
-  gap: 12px;
+  gap: 0.75rem;
 }
 
 .field__label {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--muted);
 }
@@ -302,11 +222,7 @@ a {
 .btn {
   border: 0;
   cursor: pointer;
-  transition:
-    transform 0.18s var(--ease-snappy),
-    background 0.2s var(--ease-fluid),
-    opacity 0.2s var(--ease-fluid),
-    border-color 0.2s var(--ease-fluid);
+  transition: transform 0.18s var(--ease-snappy), background 0.2s var(--ease-fluid);
 }
 
 .stepper__btn:active,
@@ -354,13 +270,123 @@ a {
   color: var(--accent);
 }
 
+.setup-error {
+  margin: 0;
+  min-height: 1.2em;
+  color: var(--danger);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+@keyframes overlayIn {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes overlayPulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+/* ——— Игровой экран ——— */
+.app {
+  width: min(100%, 430px);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding:
+    calc(14px + var(--safe-top))
+    16px
+    calc(12px + var(--safe-bottom));
+  display: flex;
+  flex-direction: column;
+  animation: appIn 0.55s var(--ease-out);
+}
+
+.app[hidden] {
+  display: none !important;
+}
+
+.app.is-enter {
+  animation: appIn 0.55s var(--ease-out);
+}
+
+@keyframes appIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.screen {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.screen--active,
+.screen:not([hidden]) {
+  display: flex;
+}
+
+.brand {
+  display: grid;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.brand__mark {
+  margin: 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.brand__title,
+.play__title {
+  margin: 0;
+  font-size: clamp(1.85rem, 6.5vw, 2.3rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.brand__text,
+.play__text,
+.deal__sub,
+.timer__label {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 .btn {
   width: 100%;
-  min-height: 60px;
+  min-height: 58px;
   border-radius: 18px;
   font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.01em;
+  flex-shrink: 0;
 }
 
 .btn--primary {
@@ -372,7 +398,6 @@ a {
 
 .btn--hold {
   margin-top: auto;
-  flex-shrink: 0;
   background: #1a2330;
   color: var(--text);
   border: 1px solid var(--line);
@@ -385,7 +410,6 @@ a {
 
 .btn--ghost {
   margin-top: auto;
-  flex-shrink: 0;
   background: transparent;
   color: var(--accent);
   border: 1px solid rgba(61, 214, 198, 0.35);
@@ -402,13 +426,6 @@ a {
   opacity: 0.45;
   cursor: not-allowed;
   transform: none;
-}
-
-.hint {
-  min-height: 1.2em;
-  color: var(--danger);
-  text-align: center;
-  font-size: 0.92rem;
 }
 
 .deal__title {
@@ -437,9 +454,7 @@ a {
 
 .card {
   width: min(100%, 360px);
-  height: min(58dvh, 460px);
-  max-height: 100%;
-  aspect-ratio: auto;
+  height: min(56dvh, 440px);
   cursor: pointer;
   touch-action: none;
   user-select: none;
@@ -558,7 +573,7 @@ a {
 }
 
 .locations {
-  border-radius: var(--radius-sm);
+  border-radius: 14px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.03);
   overflow: hidden;
@@ -582,7 +597,7 @@ a {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px 12px;
-  max-height: 200px;
+  max-height: 180px;
   overflow: auto;
   list-style: none;
 }
@@ -593,20 +608,32 @@ a {
   line-height: 1.35;
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Как в KuzoCards */
+.footer {
+  flex-shrink: 0;
+  padding-top: 10px;
+  text-align: center;
+}
+
+.footer p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(242, 245, 248, 0.45);
+}
+
+.footer a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(61, 214, 198, 0.35);
+}
+
+.footer a:active {
+  opacity: 0.85;
 }
 
 @media (max-height: 700px) {
   .card {
-    height: min(52dvh, 380px);
+    height: min(50dvh, 360px);
   }
 
   .stepper__btn,

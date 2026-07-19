@@ -9,55 +9,51 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Welcome как в KuzoCards -->
-  <div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
-    <div class="welcome__glow" aria-hidden="true"></div>
-    <p class="welcome__brand">KuzoSpy</p>
-    <h1 class="welcome__title" id="welcomeTitle">Добро пожаловать!</h1>
-    <p class="welcome__text">
+  <!-- Окно 1: Welcome -->
+  <div class="overlay" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <div class="overlay__glow" aria-hidden="true"></div>
+    <p class="overlay__brand">KuzoSpy</p>
+    <h1 class="overlay__title" id="welcomeTitle">Добро пожаловать!</h1>
+    <p class="overlay__text">
       Локальная игра «Шпион» для компании.
       Один телефон по&nbsp;кругу — найдите шпиона среди своих.
     </p>
-    <button type="button" class="welcome__btn" id="welcome-btn">Начать</button>
-    <a class="welcome__chat" href="https://t.me/kuzoceo" target="_blank" rel="noopener noreferrer">
-      Написать в&nbsp;чат · @kuzoceo
-    </a>
+    <button type="button" class="overlay__btn" id="welcome-btn">Начать</button>
   </div>
 
+  <!-- Окно 2: Игроки и шпионы -->
+  <div class="overlay overlay--setup" id="setup" hidden role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+    <div class="overlay__glow" aria-hidden="true"></div>
+    <p class="overlay__brand">KuzoSpy</p>
+    <h2 class="overlay__title overlay__title--sm" id="setupTitle">Состав игры</h2>
+    <p class="overlay__text">Сколько игроков и&nbsp;шпионов за&nbsp;столом</p>
+
+    <div class="setup-box">
+      <label class="field">
+        <span class="field__label">Игроки</span>
+        <div class="stepper" data-stepper="players">
+          <button type="button" class="stepper__btn" data-action="minus" aria-label="Меньше игроков">−</button>
+          <span class="stepper__value" id="players-value">5</span>
+          <button type="button" class="stepper__btn" data-action="plus" aria-label="Больше игроков">+</button>
+        </div>
+      </label>
+
+      <label class="field">
+        <span class="field__label">Шпионы</span>
+        <div class="chips" id="spies-chips" role="group" aria-label="Число шпионов">
+          <button type="button" class="chip chip--active" data-spies="1">1</button>
+          <button type="button" class="chip" data-spies="2">2</button>
+        </div>
+      </label>
+    </div>
+
+    <button type="button" class="overlay__btn" id="btn-start">Поехали!</button>
+    <p class="setup-error" id="setup-error" hidden></p>
+  </div>
+
+  <!-- Окно 3: Карты / игра -->
   <main class="app" id="app" hidden>
-    <!-- Шаг 1: Настройка -->
-    <section class="screen screen--active" id="screen-setup" aria-label="Настройка игры">
-      <header class="brand">
-        <p class="brand__mark">KuzoSpy</p>
-        <h2 class="brand__title">Найди шпиона</h2>
-        <p class="brand__text">Выбери состав и&nbsp;жми «Поехали!»</p>
-      </header>
-
-      <div class="panel">
-        <label class="field">
-          <span class="field__label">Игроки</span>
-          <div class="stepper" data-stepper="players">
-            <button type="button" class="stepper__btn" data-action="minus" aria-label="Меньше игроков">−</button>
-            <span class="stepper__value" id="players-value">5</span>
-            <button type="button" class="stepper__btn" data-action="plus" aria-label="Больше игроков">+</button>
-          </div>
-        </label>
-
-        <label class="field">
-          <span class="field__label">Шпионы</span>
-          <div class="chips" id="spies-chips" role="group" aria-label="Число шпионов">
-            <button type="button" class="chip chip--active" data-spies="1">1</button>
-            <button type="button" class="chip" data-spies="2">2</button>
-          </div>
-        </label>
-      </div>
-
-      <button type="button" class="btn btn--primary" id="btn-start">Поехали!</button>
-      <p class="hint" id="setup-error" hidden></p>
-    </section>
-
-    <!-- Шаг 2: Раздача карт -->
-    <section class="screen" id="screen-deal" aria-label="Раздача карт" hidden>
+    <section class="screen screen--active" id="screen-deal" aria-label="Раздача карт">
       <p class="deal__title" id="deal-title">Игрок 1, возьми телефон</p>
       <p class="deal__sub" id="deal-sub">Зажми кнопку, чтобы посмотреть карту. Отпусти — карта спрячется.</p>
 
@@ -80,7 +76,6 @@
       <button type="button" class="btn btn--ghost" id="btn-next-player" hidden>Передай телефон дальше</button>
     </section>
 
-    <!-- Шаг 3: Игра -->
     <section class="screen" id="screen-play" aria-label="Игра" hidden>
       <header class="play__header">
         <h2 class="play__title">Игра началась</h2>
@@ -100,7 +95,6 @@
       <button type="button" class="btn btn--danger" id="btn-end">Завершить игру</button>
     </section>
 
-    <!-- Финал -->
     <section class="screen" id="screen-end" aria-label="Конец игры" hidden>
       <header class="brand">
         <p class="brand__mark">KuzoSpy</p>
@@ -109,6 +103,10 @@
       </header>
       <button type="button" class="btn btn--primary" id="btn-restart">Новая игра</button>
     </section>
+
+    <footer class="footer">
+      <p>Made by <a href="https://t.me/kuzoceo" target="_blank" rel="noopener noreferrer">@kuzoceo</a></p>
+    </footer>
   </main>
 
   <script src="config.js"></script>

@@ -1,13 +1,12 @@
 (() => {
   "use strict";
 
-  /** Адрес бэкенда: правь в config.js после деплоя на bot-hosting */
+  /** Адрес бэкенда: правь в config.js после деплоя на bothost */
   const API_URL = (
     window.KUZOSPY_CONFIG?.API_URL ||
-    "https://YOUR_SERVER.bot-hosting.net"
+    ""
   ).replace(/\/$/, "");
 
-  /** Запасной список мест, если /api/locations недоступен */
   const FALLBACK_LOCATIONS = [
     "Космическая станция",
     "База на Луне",
@@ -82,15 +81,15 @@
       tg.setHeaderColor("#0b0f14");
       tg.setBackgroundColor("#0b0f14");
     } catch (_) {
-      /* Telegram API может отличаться по версии */
+      /* ignore */
     }
   }
 
   const els = {
     welcome: document.getElementById("welcome"),
     welcomeBtn: document.getElementById("welcome-btn"),
+    setup: document.getElementById("setup"),
     app: document.getElementById("app"),
-    setup: document.getElementById("screen-setup"),
     deal: document.getElementById("screen-deal"),
     play: document.getElementById("screen-play"),
     end: document.getElementById("screen-end"),
@@ -120,21 +119,47 @@
     }
   }
 
-  function dismissWelcome() {
+  /** Окно 1 → Окно 2 */
+  function goWelcomeToSetup() {
     haptic("light");
-    els.welcome.classList.add("welcome--out");
+    els.welcome.classList.add("is-out");
+
     window.setTimeout(() => {
-      els.app.hidden = false;
-      showScreen("setup");
+      showSetupWindow();
     }, 180);
+
     window.setTimeout(() => {
       els.welcome.hidden = true;
+      els.welcome.classList.remove("is-out");
     }, 680);
   }
 
-  function showScreen(name) {
+  function showSetupWindow() {
+    els.setup.hidden = false;
+    els.setup.classList.remove("is-out", "is-in");
+    void els.setup.offsetWidth;
+    requestAnimationFrame(() => {
+      els.setup.classList.add("is-in");
+    });
+  }
+
+  /** Окно 2 → Окно 3 (карты) */
+  function goSetupToDeal() {
+    els.setup.classList.remove("is-in");
+    els.setup.classList.add("is-out");
+
+    window.setTimeout(() => {
+      els.setup.hidden = true;
+      els.setup.classList.remove("is-out", "is-in");
+      els.app.hidden = false;
+      els.app.classList.add("is-enter");
+      window.setTimeout(() => els.app.classList.remove("is-enter"), 700);
+      prepareDealScreen();
+    }, 620);
+  }
+
+  function showGameScreen(name) {
     const map = {
-      setup: els.setup,
       deal: els.deal,
       play: els.play,
       end: els.end,
@@ -281,7 +306,7 @@
     els.btnReveal.disabled = false;
     els.btnNextPlayer.hidden = true;
     updateDealCopy("take");
-    showScreen("deal");
+    showGameScreen("deal");
   }
 
   function updateDealCopy(mode) {
@@ -352,23 +377,24 @@
   }
 
   function startPlayScreen() {
-    showScreen("play");
+    showGameScreen("play");
     startTimer();
   }
 
   function endGame() {
     stopTimer();
-    showScreen("end");
+    showGameScreen("end");
   }
 
+  /** Новая игра → снова окно состава */
   function resetToSetup() {
     stopTimer();
     state.cards = [];
     state.currentIndex = 0;
     state.hasSeenCard = false;
     setSetupError("");
-    els.app.hidden = false;
-    showScreen("setup");
+    els.app.hidden = true;
+    showSetupWindow();
   }
 
   async function startGame() {
@@ -392,7 +418,7 @@
               const errorData = await response.json();
               if (errorData.detail) detail = String(errorData.detail);
             } catch (_) {
-              /* ignore parse errors */
+              /* ignore */
             }
             throw new Error(detail);
           }
@@ -403,7 +429,6 @@
           }
           cards = data.cards;
         } catch (_) {
-          /* Bothost без домена — играем локально */
           cards = null;
         }
       }
@@ -414,12 +439,11 @@
 
       state.cards = cards;
       await loadLocations();
-      prepareDealScreen();
+      haptic("medium");
+      goSetupToDeal();
     } catch (error) {
       const message =
-        error instanceof Error
-          ? error.message
-          : "Не удалось начать игру.";
+        error instanceof Error ? error.message : "Не удалось начать игру.";
       setSetupError(message);
     } finally {
       els.btnStart.disabled = false;
@@ -427,10 +451,10 @@
     }
   }
 
-  /* ——— События настройки ——— */
   document.querySelector('[data-stepper="players"]').addEventListener("click", (event) => {
     const button = event.target.closest("[data-action]");
     if (!button) return;
+    haptic("light");
 
     if (button.dataset.action === "minus") {
       state.players = Math.max(3, state.players - 1);
@@ -457,15 +481,15 @@
     setSetupError("");
     state.spies = value;
     updateSpiesUI();
+    haptic("light");
   });
 
-  els.welcomeBtn.addEventListener("click", dismissWelcome);
+  els.welcomeBtn.addEventListener("click", goWelcomeToSetup);
 
   els.btnStart.addEventListener("click", () => {
     void startGame();
   });
 
-  /* ——— Зажать / отпустить карту ——— */
   const revealTargets = [els.btnReveal, els.roleCard];
 
   function onRevealStart(event) {
@@ -500,6 +524,7 @@
   updatePlayersUI();
   updateSpiesUI();
   els.app.hidden = true;
+  els.setup.hidden = true;
   els.welcome.hidden = false;
-  els.welcome.classList.remove("welcome--out");
+  els.welcome.classList.remove("is-out");
 })();
