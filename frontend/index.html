@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#0b0f14">
+  <title>KuzoSpy</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app" id="app">
+    <!-- Шаг 1: Настройка -->
+    <section class="screen screen--active" id="screen-setup" aria-label="Настройка игры">
+      <header class="brand">
+        <p class="brand__mark">KuzoSpy</p>
+        <h1 class="brand__title">Найди шпиона</h1>
+        <p class="brand__text">Один телефон по&nbsp;кругу. Смотри карту только ты.</p>
+      </header>
+
+      <div class="panel">
+        <label class="field">
+          <span class="field__label">Игроки</span>
+          <div class="stepper" data-stepper="players">
+            <button type="button" class="stepper__btn" data-action="minus" aria-label="Меньше игроков">−</button>
+            <span class="stepper__value" id="players-value">5</span>
+            <button type="button" class="stepper__btn" data-action="plus" aria-label="Больше игроков">+</button>
+          </div>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Шпионы</span>
+          <div class="chips" id="spies-chips" role="group" aria-label="Число шпионов">
+            <button type="button" class="chip chip--active" data-spies="1">1</button>
+            <button type="button" class="chip" data-spies="2">2</button>
+          </div>
+        </label>
+      </div>
+
+      <button type="button" class="btn btn--primary" id="btn-start">Поехали!</button>
+      <p class="hint" id="setup-error" hidden></p>
+    </section>
+
+    <!-- Шаг 2: Раздача карт -->
+    <section class="screen" id="screen-deal" aria-label="Раздача карт" hidden>
+      <p class="deal__title" id="deal-title">Игрок 1, возьми телефон</p>
+      <p class="deal__sub" id="deal-sub">Зажми кнопку, чтобы посмотреть карту. Отпусти — карта спрячется.</p>
+
+      <div class="card-stage">
+        <div class="card" id="role-card" aria-live="polite">
+          <div class="card__inner">
+            <div class="card__face card__face--back">
+              <span class="card__logo">KS</span>
+              <span class="card__back-text">KuzoSpy</span>
+            </div>
+            <div class="card__face card__face--front">
+              <span class="card__role-label" id="card-role-label">Твоя роль</span>
+              <span class="card__role" id="card-role">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn--hold" id="btn-reveal">Посмотреть карту</button>
+      <button type="button" class="btn btn--ghost" id="btn-next-player" hidden>Передай телефон дальше</button>
+    </section>
+
+    <!-- Шаг 3: Игра -->
+    <section class="screen" id="screen-play" aria-label="Игра" hidden>
+      <header class="play__header">
+        <h2 class="play__title">Игра началась</h2>
+        <p class="play__text">Задавайте вопросы. Найдите шпиона до&nbsp;конца таймера.</p>
+      </header>
+
+      <div class="timer" id="timer" aria-live="polite">
+        <span class="timer__digits" id="timer-digits">05:00</span>
+        <span class="timer__label">осталось</span>
+      </div>
+
+      <details class="locations">
+        <summary class="locations__summary">Все места (для шпиона)</summary>
+        <ul class="locations__list" id="locations-list"></ul>
+      </details>
+
+      <button type="button" class="btn btn--danger" id="btn-end">Завершить игру</button>
+    </section>
+
+    <!-- Финал -->
+    <section class="screen" id="screen-end" aria-label="Конец игры" hidden>
+      <header class="brand">
+        <p class="brand__mark">KuzoSpy</p>
+        <h2 class="brand__title">Игра окончена</h2>
+        <p class="brand__text">Обсудите, кто был шпионом, и&nbsp;начните заново.</p>
+      </header>
+      <button type="button" class="btn btn--primary" id="btn-restart">Новая игра</button>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+KuzoSpy — что заполнить на bot-hosting.ru
+========================================
+
+Mini App (фронт) уже будет здесь:
+https://kuzo52.github.io/kuzospy/
+
+
+1) ЧТО ЗАГРУЗИТЬ НА ХОСТИНГ
+---------------------------
+Залей на сервер СОДЕРЖИМОЕ папки backend/ :
+
+  main.py
+  requirements.txt
+  database/
+  handlers/
+  .env          ← создай на сервере сам (см. ниже)
+
+
+2) ФАЙЛ .env НА СЕРВЕРЕ
+-----------------------
+Создай файл .env рядом с main.py:
+
+  BOT_TOKEN=сюда_токен_из_BotFather
+  WEBAPP_URL=https://kuzo52.github.io/kuzospy/
+  HOST=0.0.0.0
+  PORT=8000
+
+Важно:
+- PORT часто даёт сам хостинг — если в панели указан другой порт,
+  поставь его вместо 8000.
+- Токен НЕ свети в публичном репозитории. В GitHub его нет.
+
+
+3) ЗАПУСК (как обычно просят на bot-hosting)
+--------------------------------------------
+  pip install -r requirements.txt
+  python main.py
+
+Или, если хостинг ждёт uvicorn:
+  uvicorn main:app --host 0.0.0.0 --port $PORT
+
+
+4) ПОСЛЕ ТОГО КАК ПОЛУЧИШЬ ССЫЛКУ НА СЕРВЕР
+-------------------------------------------
+Пример: https://xxxx.bot-hosting.net
+
+А) Проверь в браузере:
+   https://xxxx.bot-hosting.net/
+   Должно ответить: {"status":"ok","service":"KuzoSpy"}
+
+Б) Открой у себя в проекте файл:
+   frontend/config.js
+
+   Замени строку:
+   API_URL: "https://YOUR_SERVER.bot-hosting.net",
+
+   на свой адрес БЕЗ слэша в конце, например:
+   API_URL: "https://xxxx.bot-hosting.net",
+
+В) Закоммить и запушь в GitHub (ветка main).
+   GitHub Pages сам обновит Mini App за 1–2 минуты.
+
+
+5) BOTFATHER (1 РАЗ)
+--------------------
+1. Открой @BotFather
+2. /mybots → свой бот → Bot Settings → Menu Button
+   (или команда /setmenubutton)
+3. Укажи URL: https://kuzo52.github.io/kuzospy/
+4. Текст кнопки: Играть
+
+Домен для Web App уже HTTPS (GitHub Pages) — отдельно ничего
+покупать не нужно.
+
+
+6) ПРОВЕРКА ИГРЫ
+----------------
+1. Напиши боту /start → кнопка «Открыть KuzoSpy»
+2. Выбери игроков → «Поехали!»
+3. Если карты раздаются — бэкенд и фронт связаны правильно.
+
+
+Кратко: хостинг = только backend + .env.
+Фронт уже на GitHub Pages. Связка = одна строка в config.js.
