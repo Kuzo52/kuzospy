@@ -19,7 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 from database.db import get_all_locations, get_random_location, init_db
-from handlers.bot import setup_bot
+from handlers.bot import configure_menu_button, setup_bot
 
 BOT_TOKEN = os.getenv("BOT_TOKEN", "").strip()
 HOST = os.getenv("HOST", "0.0.0.0")
@@ -38,7 +38,18 @@ setup_bot(bot, dp)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
-    polling_task = asyncio.create_task(dp.start_polling(bot))
+
+    # Сброс webhook + старых апдейтов = меньше лагов и конфликтов
+    try:
+        await bot.delete_webhook(drop_pending_updates=True)
+    except Exception:
+        pass
+
+    await configure_menu_button(bot)
+
+    polling_task = asyncio.create_task(
+        dp.start_polling(bot, drop_pending_updates=True)
+    )
     try:
         yield
     finally:
